@@ -1,0 +1,54 @@
+package com.example.library.strategies;
+
+import com.example.library.factories.BookItemFactory;
+import com.example.library.models.*;
+import com.example.library.reposiories.BookItemRepository;
+import com.example.library.reposiories.BookRepository;
+import com.example.library.services.UserServiceClient;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+import java.util.UUID;
+
+@Service
+public class BuyStrategy implements BookingStrategy{
+    private BookRepository bookRepository;
+    private BookItemRepository bookItemRepository;
+    private UserServiceClient userServiceClient;
+
+    public BuyStrategy(BookRepository bookRepository,
+                           BookItemRepository bookItemRepository,
+                            UserServiceClient userServiceClient){
+        this.bookRepository=bookRepository;
+        this.bookItemRepository = bookItemRepository;
+        this.userServiceClient=userServiceClient;
+    }
+   public TransactionType getTransactionType(){
+        return TransactionType.BUY;
+    }
+    @Override
+    public BookItem processTransaction(String userId, Long bookId) {
+
+        // validate user
+        userServiceClient.getUserById(userId);
+        // checking if book  is valid
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new RuntimeException("Ordered book is not found"));
+        // checking books are in stock
+        if (book.getBookstatus().equals(BookStatus.NOT_AVAILABLE)) {
+            throw new RuntimeException("Ordered book is not available. Come back later");
+        }
+
+        // creating bookItem and setting transaction
+        BookItem bookItem = BookItemFactory.create(book, userId, TransactionType.BUY);
+        bookItemRepository.save(bookItem);
+
+        book.setQuantity(book.getQuantity() - 1);
+        if (book.getQuantity() < 1) {
+            book.setBookstatus(BookStatus.NOT_AVAILABLE);
+        }
+        bookRepository.save(book);
+
+        return bookItem;
+    }
+}
