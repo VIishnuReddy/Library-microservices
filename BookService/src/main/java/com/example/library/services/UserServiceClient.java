@@ -1,29 +1,14 @@
 package com.example.library.services;
 
 import com.example.library.dtos.UserResponseDto;
-import com.example.library.exceptions.UserNotFoundException;
-import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestClient;
-import org.springframework.web.client.RestClientResponseException;
+import org.springframework.cloud.openfeign.FeignClient;
 
-@Service
-public class UserServiceClient {
-    private final RestClient restClient;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
-    public UserServiceClient(RestClient restClient){
-        this.restClient=restClient;
-    }
+@FeignClient(name="USER-SERVICE")
+public interface UserServiceClient {
 
-   public UserResponseDto getUserById(String userId){
-       try{
-           return restClient.get().uri("/users/{userId}",userId)
-                   .retrieve().body(UserResponseDto.class);
-       } catch(RestClientResponseException ex){
-           if(ex.getStatusCode().value()==404){
-               throw new UserNotFoundException("User not found with id + "+ userId);
-           }
-           throw ex;
-       }
-
-   }
+    @GetMapping("/users/{userId}")
+    UserResponseDto getUserById(@PathVariable String userId);
 }

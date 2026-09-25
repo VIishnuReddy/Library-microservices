@@ -3,6 +3,7 @@ package com.example.library.controllers;
 import com.example.library.models.Book;
 import com.example.library.models.BookStatus;
 import com.example.library.services.BookService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -42,5 +43,17 @@ public class BookController {
     @GetMapping
     public ResponseEntity<List<Book>> getBooksByStatus(@RequestParam BookStatus bookStatus){
         return ResponseEntity.ok(bookService.findBooksByBookStatus(bookStatus));
+    }
+
+    @GetMapping("/retry-test")
+    public ResponseEntity<String> retryTest(){
+        System.out.println("retry-test endpoint called");
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("temporary failure");
+    }
+
+    @GetMapping("/timeOut")
+    public ResponseEntity<String> timeout() throws InterruptedException{
+        Thread.sleep(5000);
+        return ResponseEntity.ok("Book Service responded");
     }
 }

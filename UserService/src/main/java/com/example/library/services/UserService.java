@@ -6,6 +6,7 @@ import com.example.library.dtos.UserRegistrationDto;
 import com.example.library.dtos.UserResponseDto;
 import com.example.library.exceptions.InvalidLoginFoundException;
 import com.example.library.exceptions.UserAlreadyExistsException;
+import com.example.library.exceptions.UserNotFoundException;
 import com.example.library.models.User;
 import com.example.library.reposiories.UserRepository;
 import org.springframework.stereotype.Service;
@@ -51,7 +52,7 @@ public class UserService {
     public UserResponseDto getUserById(String userId) {
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
 
         return new UserResponseDto(user.getId(), user.getEmail());
     }
