@@ -3,6 +3,8 @@ package com.example.library.controllers;
 import com.example.library.models.Book;
 import com.example.library.models.BookStatus;
 import com.example.library.services.BookService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +15,8 @@ import java.util.List;
 @RequestMapping("/books")
 public class BookController {
 
+    private static final Logger log = LoggerFactory.getLogger(BookController.class);
+
     BookService bookService;
 
     BookController(BookService bookService){
@@ -21,6 +25,7 @@ public class BookController {
 
     @GetMapping("/getBooks")
     public List<Book> getBooks(){
+        log.info("fetching all books");
         return bookService.getBooks();
     }
 

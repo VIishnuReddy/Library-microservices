@@ -1,0 +1,44 @@
+local.file_match "book_service" {
+    path_targets = [
+        {
+            __path__ = "/var/log/book-service/*.json",
+        },
+    ]
+}
+
+local.file_match "user_service" {
+    path_targets = [
+        {
+            __path__ = "/var/log/user-service/*.json",
+        },
+    ]
+}
+
+local.file_match "api_gateway" {
+    path_targets = [
+        {
+            __path__ = "/var/log/api-gateway/*.json",
+        },
+    ]
+}
+
+loki.source.file "book_service" {
+    targets    = local.file_match.book_service.targets
+    forward_to = [loki.write.local.receiver]
+}
+
+loki.source.file "user_service" {
+    targets    = local.file_match.user_service.targets
+    forward_to = [loki.write.local.receiver]
+}
+
+loki.source.file "api_gateway" {
+    targets    = local.file_match.api_gateway.targets
+    forward_to = [loki.write.local.receiver]
+}
+
+loki.write "local" {
+    endpoint {
+        url = "http://host.docker.internal:3100/loki/api/v1/push"
+    }
+}

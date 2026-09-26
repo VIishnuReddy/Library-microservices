@@ -6,6 +6,8 @@ import com.example.library.models.*;
 import com.example.library.reposiories.BookItemRepository;
 import com.example.library.reposiories.BookRepository;
 import com.example.library.strategies.BookingStrategy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -28,7 +30,7 @@ public class BookService {
     private TransactionService transactionService;
     private ReturnService returnService;
     private final StringRedisTemplate redisTemplate;
-
+    private static final Logger log = LoggerFactory.getLogger(BookService.class);
     public BookService(List<BookingStrategy> strategies,
                        BookRepository bookRepository,
                        BookItemRepository bookItemRepository,
@@ -103,7 +105,10 @@ public class BookService {
     @CachePut(value = "books", key = "#id")
     public Book updateBook(Long id, Book book){
         Book existingbook = bookRepository.findById(id).orElseThrow(()
-                -> new BookNotFoundException("Book not found with id "+id));
+                -> {
+            log.warn("book not found with id: {}",id);
+            return new BookNotFoundException("Book not found with id "+id);
+        });
 
         existingbook.setName(book.getName());
         existingbook.setPrice(book.getPrice());
