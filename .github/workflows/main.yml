@@ -24,4 +24,5 @@ jobs:
           cache: maven
 
       - name: Build and test
-        run: ./mvnw clean verify
+        working-directory: BookService
+        run: chmod +x mvnw && ./mvnw clean verify
