@@ -61,9 +61,4 @@ public class BookController {
         Thread.sleep(5000);
         return ResponseEntity.ok("Book Service responded");
     }
-
-    //checking if ci workflow is working or not
-    public ResponseEntity<String> CIWork(){
-        return ResponseEntity.ok("CI Pipeline works");
-    }
 }
